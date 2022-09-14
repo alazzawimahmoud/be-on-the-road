@@ -47,7 +47,7 @@ export default function Question({ question, isActive, onCommit, progress }) {
             </div>
         </div>
         {showExplanation && <div className="text-md leading-6 text-gray-900" dangerouslySetInnerHTML={{ __html: question?.explanation }} ></div>}
-        {question.isMajorFault && <BoltIcon className="absolute top-4 left-4 w-5 h-5 text-red-500" />}
+        {question?.isMajorFault && <BoltIcon className="absolute top-4 left-4 w-5 h-5 text-red-500" />}
     </div>
 }
 
