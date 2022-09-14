@@ -74,7 +74,7 @@ export default function Section() {
 
     return (
         <Container header={category?.title}>
-            <div className="flex gap-4 py-4">
+            <div className="flex justify-center gap-4 py-4">
                 <span className="isolate inline-flex rounded-md shadow-sm">
                     <button
                         type="button"
