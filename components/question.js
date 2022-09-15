@@ -20,7 +20,7 @@ export default function Question({ question, isActive, onCommit, progress, viewM
 
     useEffect(() => {
         if (question && (showExplanation || viewMode === 'STUDY')) {
-            setAnswer(question.answer);
+            setAnswer(question.answerType === 'INPUT' ? 0 : question.answer);
         } else {
             setAnswer()
         }

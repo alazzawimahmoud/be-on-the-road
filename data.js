@@ -1,4 +1,4 @@
-import { chain, kebabCase, snakeCase, uniq, uniqBy } from 'lodash';
+import { chain, kebabCase, random, snakeCase, uniq, uniqBy } from 'lodash';
 import _data from './data.json';
 
 export const categories = chain(_data)
@@ -57,7 +57,7 @@ export const data = _data.map(({
     title
 }) => {
     const answerType = generateAnswerType(s)
-    const { question, choices } = parseQuestion(q, answerType);
+    const { question, choices } = parseQuestion(q, answerType, s);
     return {
         id,
         title,
@@ -105,11 +105,15 @@ function generateAnswerType(answerValue) {
     }
 }
 
-function parseQuestion(rawQuestion, answerType) {
+function parseQuestion(rawQuestion, answerType, rawAnswer) {
 
     if (answerType === CONSTANTS.INPUT) {
         return {
-            question: rawQuestion, choices: [],
+            question: rawQuestion, choices: [
+                rawAnswer, 
+                // TODO Mocking data, remove when change answerType from INPUT to MULTI_CHOICE
+                random(100, 500), random(20, 200)
+            ],
         };
     }
 
@@ -139,11 +143,11 @@ function parseQuestion(rawQuestion, answerType) {
     if (restB.length > 0) {
         const [options] = restB;
         return {
-            
-            question: questionB, 
+
+            question: questionB,
             choices: options.split("<br />")
-            // We add A. to the first element because it was removed earlier by the .split operation
-            .map((value, index) => index === 0 ? `A.${value}` : value)
+                // We add A. to the first element because it was removed earlier by the .split operation
+                .map((value, index) => index === 0 ? `A.${value}` : value)
         };
     }
 
