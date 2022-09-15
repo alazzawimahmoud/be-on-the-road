@@ -147,7 +147,7 @@ export default function Section() {
                         Start an Exam
                     </button>
                 </span>
-                <div className="grid items-center ">{score} / {questions.length}</div>
+                <div className="grid items-center ">score : {score} / {questions.length}</div>
             </div>
             <div className="grid gap-10">
                 {['LIST', 'STUDY'].includes(viewMode) && questions.map((q, index) => <Question
