@@ -20,7 +20,7 @@ import Image from 'next/image';
 import Container from '../components/container';
 import Question from '../components/question';
 import { classNames } from '../utilities';
-import { shuffle } from 'lodash';
+import { sampleSize, shuffle } from 'lodash';
 
 
 const btnClassNames = "border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 font-medium hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500";
@@ -33,9 +33,10 @@ export default function Section() {
     const [category, setCategory] = useState();
     const [questions, setQuestions] = useState([]);
     const [selectedQuestion, setSelectedQuestion] = useState();
+    const [score, setCurrentScore] = useState(0);
     const [currentAnswers, setCurrentAnswers] = useState({});
 
-    const init = useCallback((_category, randomize = true) => {
+    const init = useCallback((_category, randomize = true, listSize) => {
         const _questions = data
             .filter(i => i.seriesId === _category.seriesId)
             .filter(i => {
@@ -45,10 +46,12 @@ export default function Section() {
                 return true;
             });
         const list = randomize ? shuffle(_questions) : _questions;
-        setQuestions(list);
-        setSelectedQuestion(list[0]);
+        const sized = listSize ? sampleSize(list, listSize) : list;
+        setQuestions(sized);
+        setSelectedQuestion(sized[0]);
         // Get user data
         setCurrentAnswers({});
+        setCurrentScore(0);
     }, [showMajorOnly]);
 
     useEffect(() => {
@@ -56,7 +59,7 @@ export default function Section() {
         if (section) {
             const _category = categories.find(i => i.slug === section)
             setCategory(_category);
-            setShowMajorOnly(router.query.major? JSON.parse(router.query.major) : false)
+            setShowMajorOnly(router.query.major ? JSON.parse(router.query.major) : false)
             setViewMode(router.query.viewMode)
         }
     }, [router.query]);
@@ -69,12 +72,18 @@ export default function Section() {
     }, [showMajorOnly, category, init]);
 
     const onSubmit = (answer, question) => {
+        const answerIsCorrect = question.answer === answer;
+        setCurrentScore((prev) => answerIsCorrect ? prev + 1 : (question.isMajorFault ? prev - 4 : prev - 1))
         setCurrentAnswers((prev) => ({ ...prev, [question.id]: answer }));
         const nextIndex = questions.indexOf(question) + 1;
         const _selectedQuestion = questions[nextIndex];
         if (_selectedQuestion) {
             setSelectedQuestion(_selectedQuestion);
         }
+    }
+
+    const startAnExam = () => {
+        init(category, true, 50);
     }
 
     return (
@@ -126,6 +135,19 @@ export default function Section() {
                         Single
                     </button>
                 </span>
+                <span className="inline-flex rounded-md shadow-sm isolate">
+                    <button
+                        type="button"
+                        onClick={startAnExam}
+                        className={classNames(...[
+                            "relative inline-flex items-center rounded",
+                            btnClassNames
+                        ])}
+                    >
+                        Start an Exam
+                    </button>
+                </span>
+                <div className="grid items-center ">{score} / {questions.length}</div>
             </div>
             <div className="grid gap-10">
                 {['LIST', 'STUDY'].includes(viewMode) && questions.map((q, index) => <Question
