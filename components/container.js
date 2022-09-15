@@ -9,10 +9,9 @@ import {
     HomeIcon,
     InboxIcon,
     UsersIcon,
-    XMarkIcon,
-    ChevronRightIcon
+    XMarkIcon
 } from '@heroicons/react/24/outline'
-import { MagnifyingGlassIcon, BoltIcon } from '@heroicons/react/20/solid'
+import { MagnifyingGlassIcon, BoltIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import { categories } from '../data';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -30,7 +29,8 @@ function classNames(...classes) {
 
 export default function Container({ header, children }) {
     const router = useRouter();
-    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [showSidebar, setShowSidebar] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     return (
         <>
             <div>
@@ -58,7 +58,7 @@ export default function Container({ header, children }) {
                                 leaveFrom="translate-x-0"
                                 leaveTo="-translate-x-full"
                             >
-                                <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-indigo-700 pt-5 pb-4">
+                                <Dialog.Panel className="relative flex flex-col flex-1 w-full max-w-xs pt-5 pb-4 bg-indigo-700">
                                     <Transition.Child
                                         as={Fragment}
                                         enter="ease-in-out duration-300"
@@ -68,23 +68,23 @@ export default function Container({ header, children }) {
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
                                     >
-                                        <div className="absolute top-0 right-0 -mr-12 pt-2">
+                                        <div className="absolute top-0 right-0 pt-2 -mr-12">
                                             <button
                                                 type="button"
-                                                className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                                                className="flex items-center justify-center w-10 h-10 ml-1 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                                                 onClick={() => setSidebarOpen(false)}
                                             >
                                                 <span className="sr-only">Close sidebar</span>
-                                                <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                                                <XMarkIcon className="w-6 h-6 text-white" aria-hidden="true" />
                                             </button>
                                         </div>
                                     </Transition.Child>
-                                    <div className="flex flex-shrink-0 items-center px-4">
-                                        <BoltIcon className="mr-4 h-6 w-6 flex-shrink-0 text-indigo-300" />
+                                    <div className="flex items-center flex-shrink-0 px-4">
+                                        <BoltIcon className="flex-shrink-0 w-6 h-6 mr-4 text-indigo-300" />
                                         <div className="text-lg font-semibold text-white">BE on the Road</div>
                                     </div>
-                                    <div className="mt-5 h-0 flex-1 overflow-y-auto">
-                                        <nav className="space-y-1 px-2">
+                                    <div className="flex-1 h-0 mt-5 overflow-y-auto">
+                                        <nav className="px-2 space-y-1">
                                             {categories.map((item) => (
                                                 <Link key={item.title} href={item.path}>
                                                     <a
@@ -95,8 +95,9 @@ export default function Container({ header, children }) {
                                                             'group flex items-center px-2 py-2 text-base font-medium rounded-md'
                                                         )}
                                                     >
-                                                        <ChevronRightIcon className="mr-4 h-6 w-6 flex-shrink-0 text-indigo-300" aria-hidden="true" />
+                                                        <ChevronRightIcon className="flex-shrink-0 w-6 h-6 mr-4 text-indigo-300" aria-hidden="true" />
                                                         {item.title}
+                                                        <div className="pl-3 text-xs font-thin" >{item.total}</div>
                                                     </a>
                                                 </Link>
                                             ))}
@@ -104,7 +105,7 @@ export default function Container({ header, children }) {
                                     </div>
                                 </Dialog.Panel>
                             </Transition.Child>
-                            <div className="w-14 flex-shrink-0" aria-hidden="true">
+                            <div className="flex-shrink-0 w-14" aria-hidden="true">
                                 {/* Dummy element to force sidebar to shrink to fit close icon */}
                             </div>
                         </div>
@@ -112,15 +113,18 @@ export default function Container({ header, children }) {
                 </Transition.Root>
 
                 {/* Static sidebar for desktop */}
-                <div className="hidden md:fixed md:inset-y-0 md:flex md:w-80 md:flex-col">
+                <div className={classNames(...[
+                    "hidden",
+                    showSidebar ? "md:fixed md:inset-y-0 md:flex md:w-80 md:flex-col" : ""
+                ])}>
                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                    <div className="flex flex-grow flex-col overflow-hidden hover:overflow-auto bg-indigo-700 pt-5">
-                        <div className="flex flex-shrink-0 items-center px-4">
-                            <BoltIcon className="mr-4 h-6 w-6 flex-shrink-0 text-indigo-300" />
+                    <div className="flex flex-col flex-grow pt-5 overflow-hidden bg-indigo-700 hover:overflow-auto">
+                        <div className="flex items-center flex-shrink-0 px-4">
+                            <BoltIcon className="flex-shrink-0 w-6 h-6 mr-4 text-indigo-300" />
                             <div className="text-lg font-semibold text-white">BE on the Road</div>
                         </div>
-                        <div className="mt-5 flex flex-1 flex-col">
-                            <nav className="flex-1 space-y-1 px-2 pb-4">
+                        <div className="flex flex-col flex-1 mt-5">
+                            <nav className="flex-1 px-2 pb-4 space-y-1">
                                 {categories.map((item) => (
                                     <Link key={item.title} href={item.path}>
                                         <a
@@ -131,8 +135,9 @@ export default function Container({ header, children }) {
                                                 'group cursor-pointer flex items-center px-2 py-2 text-base font-medium rounded-md'
                                             )}
                                         >
-                                            <ChevronRightIcon className="mr-4 h-6 w-6 flex-shrink-0 text-indigo-300" aria-hidden="true" />
+                                            <ChevronRightIcon className="flex-shrink-0 w-6 h-6 mr-4 text-indigo-300" aria-hidden="true" />
                                             {item.title}
+                                            <div className="pl-3 text-xs font-thin" >{item.total}</div>
                                         </a>
                                     </Link>
                                 ))}
@@ -140,25 +145,35 @@ export default function Container({ header, children }) {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-1 flex-col md:pl-80">
-                    <div className="sticky top-0 z-10 flex h-16 flex-shrink-0">
+                <div className={classNames(...[
+                    "flex flex-col flex-1",
+                    showSidebar ? 'md:pl-80' : '',
+                ])}>
+                    <div className="sticky top-0 z-10 flex flex-shrink-0 h-16">
+                        <button className={classNames(...[
+                            "hidden absolute p-4 md:block",
+                        ])} onClick={() => setShowSidebar(!showSidebar)}>
+                            {showSidebar ? <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" /> :
+                                <ChevronRightIcon className="w-6 h-6" aria-hidden="true" />}
+                        </button>
+
                         <button
                             type="button"
-                            className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+                            className="px-4 text-gray-500 border-r border-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
                             onClick={() => setSidebarOpen(true)}
                         >
                             <span className="sr-only">Open sidebar</span>
-                            <Bars3BottomLeftIcon className="h-6 w-6" aria-hidden="true" />
+                            <Bars3BottomLeftIcon className="w-6 h-6" aria-hidden="true" />
                         </button>
 
-                        <div className="mx-auto max-w-7xl hidden justify-center items-center md:grid">
+                        <div className="items-center justify-center hidden mx-auto max-w-7xl md:grid">
                             <h1 className="text-2xl font-semibold text-gray-900">{header}</h1>
                         </div>
                     </div>
 
                     <main>
                         <div className="py-6">
-                            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                            <div className="px-4 mx-auto max-w-7xl sm:px-6 md:px-8">
                                 {children}
                             </div>
                         </div>

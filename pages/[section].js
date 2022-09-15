@@ -29,7 +29,7 @@ export default function Section() {
     const router = useRouter();
     const section = router.query.section;
     const [showMajorOnly, setShowMajorOnly] = useState(false);
-    const [viewMode, setViewMode] = useState('SINGLE');
+    const [viewMode, setViewMode] = useState('STUDY');
     const [category, setCategory] = useState();
     const [questions, setQuestions] = useState([]);
     const [selectedQuestion, setSelectedQuestion] = useState();
@@ -75,7 +75,7 @@ export default function Section() {
     return (
         <Container header={category?.title}>
             <div className="flex justify-center gap-4 py-4">
-                <span className="isolate inline-flex rounded-md shadow-sm">
+                <span className="inline-flex rounded-md shadow-sm isolate">
                     <button
                         type="button"
                         onClick={() => setShowMajorOnly(!showMajorOnly)}
@@ -86,6 +86,17 @@ export default function Section() {
                         ])}
                     >
                         Major only
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setViewMode('STUDY')}
+                        className={classNames(...[
+                            "relative -ml-px inline-flex items-center",
+                            btnClassNames,
+                            viewMode === 'STUDY' ? "font-bold bg-slate-300" : " hover:text-gray-700"
+                        ])}
+                    >
+                        Study
                     </button>
                     <button
                         type="button"
@@ -112,7 +123,7 @@ export default function Section() {
                 </span>
             </div>
             <div className="grid gap-4">
-                {viewMode === 'LIST' && questions.map((q, index) => <Question
+                { ['LIST', 'STUDY'].includes(viewMode) && questions.map((q, index) => <Question
                     key={q.id}
                     question={q}
                     isActive={true}
