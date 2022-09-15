@@ -1,4 +1,4 @@
-import { chain, kebabCase, random, snakeCase, uniq, uniqBy } from 'lodash';
+import { chain, kebabCase, last, random, snakeCase, uniq, uniqBy } from 'lodash';
 import _data from './data.json';
 
 export const categories = chain(_data)
@@ -65,13 +65,19 @@ export const data = _data.map(({
         image: generateImageURL(qid, seriesId),
         question,
         answer: generateAnswerValue(s, answerType),
-        explanation: e,
+        explanation: generateExplanation(e),
         points: qw,
         answerType,
         isMajorFault: Number(qw) > 1,
         choices
     }
 });
+
+function generateExplanation(rawExplanation = '') {
+    const parts = rawExplanation.split(']<br />');
+    
+    return last(parts);
+}
 
 function generateImageURL(imageId, seriesId) {
     return `${CONSTANTS.ASSETS_BASEURL}/${seriesId}/${imageId}.jpg`;
