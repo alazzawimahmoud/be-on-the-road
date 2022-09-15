@@ -168,9 +168,10 @@ export default function Container({ header, children }) {
 
                         <div className="grid items-center justify-center pr-4 mx-auto text-center md:pr-0 max-w-7xl">
                             <h1 className="text-2xl font-semibold text-gray-900">{header}</h1>
-                            <h1  className="flex items-center justify-center text-sm font-thin text-gray-400">
+                            {userId && <h1 className="flex items-center justify-center text-sm font-thin text-gray-400">
                                 <UserIcon className="w-3 h-3" />
-                                {userId}</h1>
+                                {userId}
+                            </h1>}
                         </div>
                     </div>
 
