@@ -19,12 +19,12 @@ export default function Question({ question, isActive, onCommit, progress, viewM
     }, [question]);
 
     useEffect(() => {
-        if (showExplanation || viewMode === 'STUDY') {
+        if (question && (showExplanation || viewMode === 'STUDY')) {
             setAnswer(question.answer);
         } else {
             setAnswer()
         }
-    }, [question.answer, viewMode, showExplanation]);
+    }, [viewMode, showExplanation, question]);
 
     return <div className={classNames(...[
         "rounded h-min border-b border-gray-200 grid gap-4 bg-white px-4 py-5 sm:px-6 relative",
@@ -55,7 +55,7 @@ export default function Question({ question, isActive, onCommit, progress, viewM
             </div>
         </div>
         {(showExplanation || viewMode === 'STUDY') && <div className="p-5 leading-6 text-gray-900 rounded bg-slate-300 text-md" dangerouslySetInnerHTML={{ __html: question?.explanation }} ></div>}
-        {question?.isMajorFault && <BoltIcon className="absolute w-5 h-5 text-red-500 top-4 left-4" />}
+        {question?.isMajorFault && <BoltIcon className="absolute w-5 h-5 text-red-500 top-2 left-2" />}
     </div>
 }
 

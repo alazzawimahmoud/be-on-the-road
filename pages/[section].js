@@ -28,7 +28,6 @@ const btnClassNames = "border border-gray-300 bg-white px-4 py-2 text-sm text-gr
 
 export default function Section() {
     const router = useRouter();
-    const section = router.query.section;
     const [showMajorOnly, setShowMajorOnly] = useState(false);
     const [viewMode, setViewMode] = useState('STUDY');
     const [category, setCategory] = useState();
@@ -53,11 +52,14 @@ export default function Section() {
     }, [showMajorOnly]);
 
     useEffect(() => {
+        const { section } = router.query
         if (section) {
             const _category = categories.find(i => i.slug === section)
             setCategory(_category);
+            setShowMajorOnly(JSON.parse(router.query.major))
+            setViewMode(router.query.viewMode)
         }
-    }, [section]);
+    }, [router.query]);
 
 
     useEffect(() => {
