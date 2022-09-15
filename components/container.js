@@ -17,12 +17,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 
-const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
-    { name: 'Sign out', href: '#' },
-]
-
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
@@ -31,6 +25,13 @@ export default function Container({ header, children }) {
     const router = useRouter();
     const [showSidebar, setShowSidebar] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const hrefWithQueryParams = (href) => {
+        const userId = router.query.userId;
+        if (userId) {
+            return `${href}?userId=${userId}`
+        }
+        return href;
+    }
     return (
         <>
             <div>
@@ -86,10 +87,9 @@ export default function Container({ header, children }) {
                                     <div className="flex-1 h-0 mt-5 overflow-y-auto">
                                         <nav className="px-2 space-y-1">
                                             {categories.map((item) => (
-                                                <Link key={item.title} href={item.path}>
+                                                <Link key={item.title} href={hrefWithQueryParams(item.path)}>
                                                     <a
                                                         key={item.seriesId}
-                                                        href={item.href}
                                                         className={classNames(
                                                             item.current ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-600',
                                                             'group flex items-center px-2 py-2 text-base font-medium rounded-md'
@@ -126,10 +126,9 @@ export default function Container({ header, children }) {
                         <div className="flex flex-col flex-1 mt-5">
                             <nav className="flex-1 px-2 pb-4 space-y-1">
                                 {categories.map((item) => (
-                                    <Link key={item.title} href={item.path}>
+                                    <Link key={item.title} href={hrefWithQueryParams(item.path)}>
                                         <a
                                             key={item.seriesId}
-                                            href={item.href}
                                             className={classNames(
                                                 router.asPath === item.path ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-600',
                                                 'group cursor-pointer flex items-center px-2 py-2 text-base font-medium rounded-md'
@@ -149,7 +148,7 @@ export default function Container({ header, children }) {
                     "flex flex-col flex-1",
                     showSidebar ? 'md:pl-80' : '',
                 ])}>
-                    <div className="sticky top-0 z-10 flex flex-shrink-0 h-16">
+                    <div className="top-0 z-10 flex flex-shrink-0 h-16">
                         <button className={classNames(...[
                             "hidden absolute p-4 md:block",
                         ])} onClick={() => setShowSidebar(!showSidebar)}>

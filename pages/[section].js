@@ -125,7 +125,7 @@ export default function Section() {
                     </button>
                 </span>
             </div>
-            <div className="grid gap-4">
+            <div className="grid gap-10">
                 {['LIST', 'STUDY'].includes(viewMode) && questions.map((q, index) => <Question
                     key={q.id}
                     question={q}

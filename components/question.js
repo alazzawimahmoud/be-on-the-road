@@ -19,12 +19,12 @@ export default function Question({ question, isActive, onCommit, progress, viewM
     }, [question]);
 
     useEffect(() => {
-        if (viewMode === 'STUDY') {
+        if (showExplanation || viewMode === 'STUDY') {
             setAnswer(question.answer);
         } else {
             setAnswer()
         }
-    }, [question.answer, viewMode]);
+    }, [question.answer, viewMode, showExplanation]);
 
     return <div className={classNames(...[
         "rounded h-min border-b border-gray-200 grid gap-4 bg-white px-4 py-5 sm:px-6 relative",
@@ -41,7 +41,7 @@ export default function Question({ question, isActive, onCommit, progress, viewM
             </div>
             <div className="grid gap-4 md:col-span-3">
                 <h3 className="text-lg font-medium leading-6 text-gray-900" dangerouslySetInnerHTML={{ __html: question?.question }} ></h3>
-                <Choices choices={question?.choices || []} onChange={onChange} value={answer} disabled={viewMode === 'STUDY'} />
+                <Choices choices={question?.choices || []} onChange={onChange} value={answer} disabled={(showExplanation || viewMode === 'STUDY')} />
                 <div className="flex items-center justify-end">
                     <div className="px-6">{progress}</div>
                     {viewMode !== 'STUDY' && <button
