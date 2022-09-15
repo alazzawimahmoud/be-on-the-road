@@ -20,6 +20,7 @@ import Image from 'next/image';
 import Container from '../components/container';
 import Question from '../components/question';
 import { classNames } from '../utilities';
+import { shuffle } from 'lodash';
 
 
 const btnClassNames = "border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 font-medium hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500";
@@ -35,18 +36,20 @@ export default function Section() {
     const [selectedQuestion, setSelectedQuestion] = useState();
     const [currentAnswers, setCurrentAnswers] = useState({});
 
-    const init = useCallback((_category) => {
-        const _questions = data.filter(i => i.seriesId === _category.seriesId).filter(i => {
-            if (showMajorOnly) {
-                return i.isMajorFault;
-            }
-            return true;
-        });
-
-        setQuestions(_questions);
-        setSelectedQuestion(_questions[0]);
+    const init = useCallback((_category, randomize = true) => {
+        const _questions = data
+            .filter(i => i.seriesId === _category.seriesId)
+            .filter(i => {
+                if (showMajorOnly) {
+                    return i.isMajorFault;
+                }
+                return true;
+            });
+        const list = randomize ? shuffle(_questions) : _questions;
+        setQuestions(list);
+        setSelectedQuestion(list[0]);
         // Get user data
-        setCurrentAnswers({ 988: 1 });
+        setCurrentAnswers({});
     }, [showMajorOnly]);
 
     useEffect(() => {
@@ -123,7 +126,7 @@ export default function Section() {
                 </span>
             </div>
             <div className="grid gap-4">
-                { ['LIST', 'STUDY'].includes(viewMode) && questions.map((q, index) => <Question
+                {['LIST', 'STUDY'].includes(viewMode) && questions.map((q, index) => <Question
                     key={q.id}
                     question={q}
                     isActive={true}
