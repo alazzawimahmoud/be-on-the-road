@@ -56,7 +56,7 @@ export default function Section() {
         if (section) {
             const _category = categories.find(i => i.slug === section)
             setCategory(_category);
-            setShowMajorOnly(JSON.parse(router.query.major))
+            setShowMajorOnly(router.query.major? JSON.parse(router.query.major) : false)
             setViewMode(router.query.viewMode)
         }
     }, [router.query]);
