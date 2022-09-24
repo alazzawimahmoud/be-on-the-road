@@ -58,7 +58,7 @@ export const data = _data.map(({
 }) => {
     const answerType = generateAnswerType(s)
     const { question, choices } = parseQuestion(q, answerType, s);
-    return {
+    return mapQuestion({
         id,
         title,
         seriesId,
@@ -70,12 +70,40 @@ export const data = _data.map(({
         answerType,
         isMajorFault: Number(qw) > 1,
         choices
-    }
+    });
 });
+
+function mapQuestion({
+    id,
+    title,
+    seriesId,
+    image,
+    question,
+    answer,
+    explanation,
+    points,
+    answerType,
+    isMajorFault,
+    choices
+}) {
+    return {
+        id,
+        title,
+        seriesId,
+        image,
+        question,
+        answer,
+        explanation,
+        points,
+        answerType,
+        isMajorFault,
+        choices
+    }
+}
 
 function generateExplanation(rawExplanation = '') {
     const parts = rawExplanation.split(']<br />');
-    
+
     return last(parts);
 }
 
@@ -99,6 +127,7 @@ function generateAnswerValue(answerValue, answerType) {
         answerValueMappings[answerValue] :
         answerValue;
 }
+
 function generateAnswerType(answerValue) {
     switch (true) {
         case ['a', 'b', 'c'].includes(answerValue):
@@ -116,7 +145,7 @@ function parseQuestion(rawQuestion, answerType, rawAnswer) {
     if (answerType === CONSTANTS.INPUT) {
         return {
             question: rawQuestion, choices: [
-                rawAnswer, 
+                rawAnswer,
                 // TODO Mocking data, remove when change answerType from INPUT to MULTI_CHOICE
                 random(100, 500), random(20, 200)
             ],

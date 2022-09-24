@@ -72,7 +72,16 @@ export default function Section() {
     }, [showMajorOnly, category, init]);
 
     const onSubmit = (answer, question) => {
-        const answerIsCorrect = question.answer === answer;
+        let answerIsCorrect = false;
+        switch (question.answerType) {
+            case 'INPUT':
+                const answerValue = question.choices[answer];
+                answerIsCorrect = question.answer === answerValue;
+                break;
+            default:
+                answerIsCorrect = question.answer === answer;
+                break;
+        }
         setCurrentScore((prev) => answerIsCorrect ? prev + 1 : (question.isMajorFault ? prev - 4 : prev - 1))
         setCurrentAnswers((prev) => ({ ...prev, [question.id]: answer }));
         const nextIndex = questions.indexOf(question) + 1;
