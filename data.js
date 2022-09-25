@@ -1,6 +1,6 @@
 import { chain, kebabCase, last, random, snakeCase, uniq, uniqBy } from 'lodash';
 import _data from './data.json';
-
+import { mapQuestion } from './shared';
 export const categories = chain(_data)
     .groupBy('seriesId')
     .map((group, seriesId) => {
@@ -73,33 +73,6 @@ export const data = _data.map(({
     });
 });
 
-function mapQuestion({
-    id,
-    title,
-    seriesId,
-    image,
-    question,
-    answer,
-    explanation,
-    points,
-    answerType,
-    isMajorFault,
-    choices
-}) {
-    return {
-        id,
-        title,
-        seriesId,
-        image,
-        question,
-        answer,
-        explanation,
-        points,
-        answerType,
-        isMajorFault,
-        choices
-    }
-}
 
 function generateExplanation(rawExplanation = '') {
     const parts = rawExplanation.split(']<br />');

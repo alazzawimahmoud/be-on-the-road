@@ -33,5 +33,51 @@ async function fetchAll() {
 
 
 import _data from './data-2.json';
+import { mapQuestion } from './shared';
 
-export const data = _data;
+const ANSWER_TYPES = {
+    NORMAL: 'NORMAL',
+    ORDER: 'ORDER',
+    INPUT: 'INPUT',
+}
+
+const answerTypesMappings = { normaalAntwoord: ANSWER_TYPES.NORMAL, volgordeAntwoord: ANSWER_TYPES.ORDER, invulAntwoord: ANSWER_TYPES.INPUT };
+
+export const rawData = _data.map(q => ({ ...q, answerType: answerTypesMappings[q.answerArray[0].type] }));
+export const data = rawData.map(({
+    answerArray,
+    clarification,
+    givenAnswer,
+    pointsCategory,
+    questionArray,
+    seriesId,
+    title,
+    answerType,
+}, index) => {
+
+    let answer, question;
+    let choices = [];
+    switch (answerType) {
+        case ANSWER_TYPES.INPUT:
+            question = `${questionArray.question} </ br> ${answerArray[0].fields.zin}`;
+            break;
+        default:
+            answer = answerArray.findIndex(a => a.fields.correct === "1");
+            question = questionArray.question;
+            choices = answerArray.map(a => a.fields.tekst);
+            break;
+    }
+    return mapQuestion({
+        id: `${seriesId}_${index + 1}`,
+        title,
+        seriesId,
+        image: questionArray.image,
+        question,
+        answer,
+        explanation: '',
+        points: '',
+        answerType,
+        isMajorFault: '',
+        choices,
+    })
+})

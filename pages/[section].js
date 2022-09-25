@@ -21,8 +21,9 @@ import Container from '../components/container';
 import Question from '../components/question';
 import { classNames } from '../utilities';
 import { sampleSize, shuffle } from 'lodash';
-
-
+import { rawData as d, data as data2 } from '../data-2'
+console.log(d)
+console.log(data2)
 const btnClassNames = "border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 font-medium hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500";
 
 
