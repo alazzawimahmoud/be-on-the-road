@@ -20,12 +20,13 @@ import Image from 'next/image';
 import Container from '../components/container';
 import Question from '../components/question';
 import { classNames } from '../utilities';
-import { sampleSize, shuffle } from 'lodash';
-import { rawData as d, data as data2 } from '../data-2'
-console.log(d)
-console.log(data2)
+import { sampleSize, shuffle, size } from 'lodash';
+// import { rawData as d, data as data2 } from '../data-2'
+// console.log(d)
+// console.log(data2)
 const btnClassNames = "border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 font-medium hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500";
 
+const EXAM_SIZE = 50;
 
 export default function Section() {
     const router = useRouter();
@@ -36,6 +37,7 @@ export default function Section() {
     const [selectedQuestion, setSelectedQuestion] = useState();
     const [score, setCurrentScore] = useState(0);
     const [currentAnswers, setCurrentAnswers] = useState({});
+    const [showResults, setShowResults] = useState(false);
 
     const init = useCallback((_category, randomize = true, listSize) => {
         const _questions = data
@@ -53,6 +55,7 @@ export default function Section() {
         // Get user data
         setCurrentAnswers({});
         setCurrentScore(0);
+        setShowResults(false);
     }, [showMajorOnly]);
 
     useEffect(() => {
@@ -72,6 +75,12 @@ export default function Section() {
         }
     }, [showMajorOnly, category, init]);
 
+    useEffect(() => {
+        if (size(currentAnswers) === EXAM_SIZE) {
+            setShowResults(true);
+        }
+    }, [currentAnswers]);
+
     const onSubmit = (answer, question) => {
         let answerIsCorrect = false;
         switch (question.answerType) {
@@ -83,7 +92,7 @@ export default function Section() {
                 answerIsCorrect = question.answer === answer;
                 break;
         }
-        setCurrentScore((prev) => answerIsCorrect ? prev + 1 : (question.isMajorFault ? prev - 4 : prev - 1))
+        setCurrentScore((prev) => answerIsCorrect ? prev + 1 : (question.isMajorFault ? prev - 5 : prev))
         setCurrentAnswers((prev) => ({ ...prev, [question.id]: answer }));
         const nextIndex = questions.indexOf(question) + 1;
         const _selectedQuestion = questions[nextIndex];
@@ -93,7 +102,7 @@ export default function Section() {
     }
 
     const startAnExam = () => {
-        init(category, true, 50);
+        init(category, true, EXAM_SIZE);
     }
 
     return (
@@ -157,7 +166,7 @@ export default function Section() {
                         Start an Exam
                     </button>
                 </span>
-                <div className="grid items-center ">score : {score} / {questions.length}</div>
+                {showResults && <div className="grid items-center ">score : {score} / {questions.length}</div>}
             </div>
             <div className="grid gap-10">
                 {['LIST', 'STUDY'].includes(viewMode) && questions.map((q, index) => <Question
