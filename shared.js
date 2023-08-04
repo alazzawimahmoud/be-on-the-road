@@ -25,3 +25,9 @@ export function mapQuestion({
         choices
     }
 }
+
+export const VIEW_MODES = {
+    LIST: 'LIST',
+    SINGLE: 'SINGLE',
+    STUDY: 'STUDY',
+}

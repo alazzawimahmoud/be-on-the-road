@@ -21,6 +21,7 @@ import Container from '../components/container';
 import Question from '../components/question';
 import { classNames } from '../utilities';
 import { sampleSize, shuffle, size } from 'lodash';
+import { VIEW_MODES } from '../shared';
 // import { rawData as d, data as data2 } from '../data-2'
 // console.log(d)
 // console.log(data2)
@@ -31,7 +32,7 @@ const EXAM_SIZE = 50;
 export default function Section() {
     const router = useRouter();
     const [showMajorOnly, setShowMajorOnly] = useState(false);
-    const [viewMode, setViewMode] = useState('STUDY');
+    const [viewMode, setViewMode] = useState(VIEW_MODES.STUDY);
     const [category, setCategory] = useState();
     const [questions, setQuestions] = useState([]);
     const [selectedQuestion, setSelectedQuestion] = useState();
@@ -59,12 +60,12 @@ export default function Section() {
     }, [showMajorOnly]);
 
     useEffect(() => {
-        const { section } = router.query
+        const { section, viewMode = VIEW_MODES.STUDY, major = false } = router.query
         if (section) {
             const _category = categories.find(i => i.slug === section)
             setCategory(_category);
-            setShowMajorOnly(router.query.major ? JSON.parse(router.query.major) : false)
-            setViewMode(router.query.viewMode)
+            setShowMajorOnly(major ? JSON.parse(router.query.major) : false)
+            setViewMode(viewMode)
         }
     }, [router.query]);
 
@@ -122,33 +123,33 @@ export default function Section() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => setViewMode('STUDY')}
+                        onClick={() => setViewMode(VIEW_MODES.STUDY)}
                         className={classNames(...[
                             "relative -ml-px inline-flex items-center",
                             btnClassNames,
-                            viewMode === 'STUDY' ? "font-bold bg-slate-300" : " hover:text-gray-700"
+                            viewMode === VIEW_MODES.STUDY ? "font-bold bg-slate-300" : " hover:text-gray-700"
                         ])}
                     >
                         Study
                     </button>
                     <button
                         type="button"
-                        onClick={() => setViewMode('LIST')}
+                        onClick={() => setViewMode(VIEW_MODES.LIST)}
                         className={classNames(...[
                             "relative -ml-px inline-flex items-center",
                             btnClassNames,
-                            viewMode === 'LIST' ? "font-bold bg-slate-300" : " hover:text-gray-700"
+                            viewMode === VIEW_MODES.LIST ? "font-bold bg-slate-300" : " hover:text-gray-700"
                         ])}
                     >
                         List
                     </button>
                     <button
                         type="button"
-                        onClick={() => setViewMode('SINGLE')}
+                        onClick={() => setViewMode(VIEW_MODES.SINGLE)}
                         className={classNames(...[
                             "relative -ml-px inline-flex items-center rounded-r-md",
                             btnClassNames,
-                            viewMode === 'SINGLE' ? "font-bold bg-slate-300" : " hover:text-gray-700"
+                            viewMode === VIEW_MODES.SINGLE ? "font-bold bg-slate-300" : " hover:text-gray-700"
                         ])}
                     >
                         Single
@@ -169,7 +170,7 @@ export default function Section() {
                 {showResults && <div className="grid items-center ">score : {score} / {questions.length}</div>}
             </div>
             <div className="grid gap-10">
-                {['LIST', 'STUDY'].includes(viewMode) && questions.map((q, index) => <Question
+                {[VIEW_MODES.LIST, VIEW_MODES.STUDY].includes(viewMode) && questions.map((q, index) => <Question
                     key={q.id}
                     question={q}
                     isActive={true}
@@ -178,7 +179,7 @@ export default function Section() {
                     progress={`${questions.indexOf(q) + 1} / ${questions.length}`}
                     viewMode={viewMode}
                 />)}
-                {viewMode === 'SINGLE' && <Question
+                {viewMode === VIEW_MODES.SINGLE && <Question
                     question={selectedQuestion}
                     isActive={true}
                     onCommit={(answer) => onSubmit(answer, selectedQuestion)}
