@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 
-export default function Question({ question, isActive, onCommit, progress, viewMode }) {
+export default function Question({ question, onCommit, progress, viewMode }) {
     const [answer, setAnswer] = useState();
+    const [visualType, setVisualType] = useState('image');
     const [showExplanation, setShowExplanation] = useState(false);
 
     const onChange = (payload) => {
@@ -19,6 +20,14 @@ export default function Question({ question, isActive, onCommit, progress, viewM
     }, [question]);
 
     useEffect(() => {
+        if (question?.image || question?.video) {
+            setVisualType(question?.image ? 'image' : question?.video ? 'video' : null);
+        } else {
+            setVisualType(null);
+        }
+    }, [question]);
+
+    useEffect(() => {
         if (question && (showExplanation || viewMode === VIEW_MODES.STUDY)) {
             setAnswer(question.answerType === 'INPUT' ? 0 : question.answer);
         } else {
@@ -28,18 +37,27 @@ export default function Question({ question, isActive, onCommit, progress, viewM
 
     return <div className={classNames(...[
         "rounded h-min border-b border-gray-200 grid gap-4 bg-white px-4 py-5 sm:px-6 relative",
-        !isActive ? "opacity-50" : ""
     ])}>
-        <div className="grid h-full gap-4 md:grid-cols-5">
-            <div className="grid items-center content-center justify-center md:col-span-2">
+        <div
+            className={classNames(...[
+                "grid h-full gap-4",
+                question?.image || question?.video ? 'md:grid-cols-5' : ''
+            ])}
+        >
+            {/* TODO Add Support for video */}
+            {visualType && <div className="grid items-center content-center justify-center md:col-span-2">
                 <img
                     onDoubleClick={() => setShowExplanation(!showExplanation)}
-                    src={question?.image}
-                    alt={question?.question}
+                    src={question.image}
+                    alt={question.question}
                     className="object-center"
                 />
-            </div>
-            <div className="grid gap-4 md:col-span-3">
+            </div>}
+            <div
+                className={classNames(...[
+                    "grid gap-4",
+                    question?.image || question?.video ? 'md:col-span-3' : ''
+                ])}            >
                 <h3 className="text-lg font-medium leading-6 text-gray-900" dangerouslySetInnerHTML={{ __html: question?.question }} ></h3>
                 <Choices choices={question?.choices || []} onChange={onChange} value={answer} disabled={(showExplanation || viewMode === VIEW_MODES.STUDY)} />
                 <div className="flex items-center justify-end">
@@ -73,7 +91,7 @@ function Choices({ choices, onChange, value, disabled }) {
                 <div className="space-y-2">
                     {choices.map((choice, index) => (
                         <div
-                            key={choice}
+                            key={index}
                             onClick={() => !disabled && onChange(index)}
                             className={classNames(...[
                                 "relative flex  rounded-lg px-5 py-4 shadow-md focus:outline-none",
@@ -82,20 +100,28 @@ function Choices({ choices, onChange, value, disabled }) {
                             ])}
                         >
                             <div className="flex items-center justify-between w-full">
+                                <div className="grid items-center content-center justify-center w-6 h-6">
+                                    {choice.image && <img
+                                        src={choice.image}
+                                        alt={choice.text}
+                                        className="object-center"
+                                    />}
+                                </div>
+
                                 <div className="flex items-center">
                                     <div className="text-sm">
-                                        <p
+                                        {choice.text && <p
                                             className={`font-medium  ${value === index ? 'text-white' : 'text-gray-900'}`}
-                                            dangerouslySetInnerHTML={{ __html: choice }}
-                                        ></p>
+                                            dangerouslySetInnerHTML={{ __html: choice.text }}
+                                        ></p>}
 
                                     </div>
                                 </div>
-                                {value === index && (
-                                    <div className="text-white shrink-0">
-                                        <CheckIcon className="w-6 h-6" />
-                                    </div>
-                                )}
+
+                                <div className={`text-white shrink-0 ${value === index ? '' : 'opacity-0'}`}>
+                                    <CheckIcon className="w-6 h-6" />
+                                </div>
+
                             </div>
                         </div>
                     ))}

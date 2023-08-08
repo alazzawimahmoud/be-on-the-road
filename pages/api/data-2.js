@@ -42,7 +42,7 @@ async function fetchMultiple() {
 
 
 
-export default async function handler(req, res) {  
+export default async function handler(req, res) {
   // const data = await fetchMultiple();
   // res.status(200).json({ data });
 }

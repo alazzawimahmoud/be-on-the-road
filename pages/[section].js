@@ -1,30 +1,11 @@
-import { Fragment, useCallback, useEffect, useState } from 'react'
-import { Dialog, Menu, Transition } from '@headlessui/react'
-import {
-    Bars3BottomLeftIcon,
-    BellIcon,
-    CalendarIcon,
-    ChartBarIcon,
-    FolderIcon,
-    HomeIcon,
-    InboxIcon,
-    UsersIcon,
-    XMarkIcon,
-    ChevronRightIcon
-} from '@heroicons/react/24/outline'
-import { MagnifyingGlassIcon, BoltIcon } from '@heroicons/react/20/solid'
+import { useCallback, useEffect, useState } from 'react'
 import { categories, data } from '../data';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import Container from '../components/container';
 import Question from '../components/question';
 import { classNames } from '../utilities';
 import { sampleSize, shuffle, size } from 'lodash';
 import { VIEW_MODES } from '../shared';
-// import { rawData as d, data as data2 } from '../data-2'
-// console.log(d)
-// console.log(data2)
 const btnClassNames = "border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 font-medium hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500";
 
 const EXAM_SIZE = 50;
@@ -39,21 +20,19 @@ export default function Section() {
     const [score, setCurrentScore] = useState(0);
     const [currentAnswers, setCurrentAnswers] = useState({});
     const [showResults, setShowResults] = useState(false);
-
+    console.log({
+        category,
+        questions
+    })
     const init = useCallback((_category, randomize = true, listSize) => {
         const _questions = data
-            .filter(i => i.seriesId === _category.seriesId)
-            .filter(i => {
-                if (showMajorOnly) {
-                    return i.isMajorFault;
-                }
-                return true;
-            });
+            .filter(i => i.seriesId === _category.seriesId || i.seriesId === Number(_category.seriesId))
+            .filter(i => showMajorOnly ? i.isMajorFault : true);
         const list = randomize ? shuffle(_questions) : _questions;
         const sized = listSize ? sampleSize(list, listSize) : list;
         setQuestions(sized);
         setSelectedQuestion(sized[0]);
-        // Get user data
+        // TODO Get user data
         setCurrentAnswers({});
         setCurrentScore(0);
         setShowResults(false);
@@ -173,7 +152,6 @@ export default function Section() {
                 {[VIEW_MODES.LIST, VIEW_MODES.STUDY].includes(viewMode) && questions.map((q, index) => <Question
                     key={q.id}
                     question={q}
-                    isActive={true}
                     onCommit={(answer) => onSubmit(answer, q)}
                     currentAnswer={currentAnswers[q.id]}
                     progress={`${questions.indexOf(q) + 1} / ${questions.length}`}
@@ -181,7 +159,6 @@ export default function Section() {
                 />)}
                 {viewMode === VIEW_MODES.SINGLE && <Question
                     question={selectedQuestion}
-                    isActive={true}
                     onCommit={(answer) => onSubmit(answer, selectedQuestion)}
                     currentAnswer={currentAnswers[selectedQuestion?.id]}
                     progress={`${questions.indexOf(selectedQuestion) + 1} / ${questions.length}`}

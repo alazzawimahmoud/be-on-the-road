@@ -1,19 +1,8 @@
-import { chain, kebabCase, last, random, snakeCase, uniq, uniqBy } from 'lodash';
+import { last, random } from 'lodash';
 import _data from './data.json';
-import { mapQuestion } from './shared';
-export const categories = chain(_data)
-    .groupBy('seriesId')
-    .map((group, seriesId) => {
-        const i = group[0];
-        return {
-            title: i.title,
-            slug: kebabCase(i.title),
-            path: `/${kebabCase(i.title)}`,
-            seriesId: Number(seriesId),
-            total: group.length
-        }
-    })
-    .value();
+import { ANSWER_TYPES, mapQuestion, mapCategories, mapChoice } from '../shared';
+
+export const categories = mapCategories(_data)
 
 const example = {
     "id": "12607",
@@ -30,9 +19,6 @@ const example = {
 };
 
 export const CONSTANTS = {
-    MULTI_CHOICE: 'MULTI_CHOICE',
-    YES_NO: 'YES_NO',
-    INPUT: 'INPUT',
     YES_NO_VALUES: ['Ja', 'Neen'],
     ASSETS_BASEURL: 'https://examen.gratisrijbewijsonline.be/afbeeldingen'
 }
@@ -66,7 +52,6 @@ export const data = _data.map(({
         question,
         answer: generateAnswerValue(s, answerType),
         explanation: generateExplanation(e),
-        points: qw,
         answerType,
         isMajorFault: Number(qw) > 1,
         choices
@@ -104,30 +89,32 @@ function generateAnswerValue(answerValue, answerType) {
 function generateAnswerType(answerValue) {
     switch (true) {
         case ['a', 'b', 'c'].includes(answerValue):
-            return CONSTANTS.MULTI_CHOICE
+            return ANSWER_TYPES.SINGLE_CHOICE;
         case ['ja', 'neen'].includes(answerValue):
-            return CONSTANTS.YES_NO
+            return ANSWER_TYPES.SINGLE_CHOICE;
         default:
-            return CONSTANTS.INPUT;
+            return ANSWER_TYPES.INPUT;
 
     }
 }
 
 function parseQuestion(rawQuestion, answerType, rawAnswer) {
 
-    if (answerType === CONSTANTS.INPUT) {
+    if (answerType === ANSWER_TYPES.INPUT) {
         return {
-            question: rawQuestion, choices: [
+            question: rawQuestion,
+            choices: [
                 rawAnswer,
-                // TODO Mocking data, remove when change answerType from INPUT to MULTI_CHOICE
+                // TODO Mocking data, remove when change answerType from INPUT to SINGLE_CHOICE
                 random(100, 500), random(20, 200)
-            ],
+            ].map(mapChoice('text')),
         };
     }
 
-    if (answerType === CONSTANTS.YES_NO) {
+    if (answerType === ANSWER_TYPES.YES_NO) {
         return {
-            question: rawQuestion, choices: CONSTANTS.YES_NO_VALUES,
+            question: rawQuestion,
+            choices: CONSTANTS.YES_NO_VALUE.map(mapChoice('text')),
         };
     }
 
@@ -140,7 +127,7 @@ function parseQuestion(rawQuestion, answerType, rawAnswer) {
     if (rest.length > 0) {
         const [options] = rest;
         return {
-            question, choices: options.split("<br />")
+            question, choices: options.split("<br />").map(mapChoice('text'))
         };
     }
 
@@ -156,6 +143,7 @@ function parseQuestion(rawQuestion, answerType, rawAnswer) {
             choices: options.split("<br />")
                 // We add A. to the first element because it was removed earlier by the .split operation
                 .map((value, index) => index === 0 ? `A.${value}` : value)
+                .map(mapChoice('text'))
         };
     }
 

@@ -19,7 +19,6 @@ const list = [
     { "label": "Verkeersborden", "id": "verkeersborden" },
     { "label": "Voor de expert", "id": "voordeexpert" }
 ];
-
 const results = []
 async function fetchAll() {
     return Promise.all(
@@ -32,18 +31,20 @@ async function fetchAll() {
 }
 
 
+import { shuffle } from 'lodash';
 import _data from './data-2.json';
-import { mapQuestion } from './shared';
+import { mapQuestion, ANSWER_TYPES, mapCategories, mapChoice } from '../shared';
 
-const ANSWER_TYPES = {
-    NORMAL: 'NORMAL',
-    ORDER: 'ORDER',
-    INPUT: 'INPUT',
-}
+export const categories = mapCategories(_data);
 
-const answerTypesMappings = { normaalAntwoord: ANSWER_TYPES.NORMAL, volgordeAntwoord: ANSWER_TYPES.ORDER, invulAntwoord: ANSWER_TYPES.INPUT };
+const answerTypesMappings = {
+    normaalAntwoord: ANSWER_TYPES.SINGLE_CHOICE,
+    volgordeAntwoord: ANSWER_TYPES.ORDER,
+    invulAntwoord: ANSWER_TYPES.INPUT
+};
 
 export const rawData = _data.map(q => ({ ...q, answerType: answerTypesMappings[q.answerArray[0].type] }));
+
 export const data = rawData.map(({
     answerArray,
     clarification,
@@ -54,30 +55,62 @@ export const data = rawData.map(({
     title,
     answerType,
 }, index) => {
-
+    // TODO Support For video & for Text only questions
     let answer, question;
     let choices = [];
+    question = questionArray.question;
+    answer = answerArray.findIndex(a => a.fields.correct === "1");
+    choices = answerArray.map(a => ({
+        text: a.fields.tekst,
+        image: a.fields.afbeelding,
+    }));
     switch (answerType) {
         case ANSWER_TYPES.INPUT:
             question = `${questionArray.question} </ br> ${answerArray[0].fields.zin}`;
             break;
-        default:
-            answer = answerArray.findIndex(a => a.fields.correct === "1");
-            question = questionArray.question;
-            choices = answerArray.map(a => a.fields.tekst);
+
+        case ANSWER_TYPES.ORDER:
+            // Extract the text or images values
+            const [options = { fields: {} }] = answerArray;
+            const {
+                zin1, zin2, zin3,
+                afbeelding1, afbeelding2, afbeelding3
+            } = options.fields;
+            const textOptions = zin1 && zin2 && zin3;
+            const imageOptions = afbeelding1 && afbeelding2 && afbeelding3;
+
+            // Arrange them in the correct order
+            if (imageOptions) {
+                answer = [afbeelding1, afbeelding2, afbeelding3].map(mapChoice('image'));
+            }
+
+            if (textOptions) {
+                answer = [zin1, zin2, zin3].map(mapChoice('text'));
+            }
+
+            // Shuffle the choices, and provide the answer as indexed values of the given choices.
+            if (imageOptions || textOptions) {
+                choices = shuffle(answer);
+                answer = choices.map(choice => answer.findIndex(answerValue => answerValue === choice))
+            }
+
             break;
     }
+
     return mapQuestion({
         id: `${seriesId}_${index + 1}`,
         title,
         seriesId,
         image: questionArray.image,
+        video: questionArray.video,
         question,
         answer,
-        explanation: '',
-        points: '',
+        explanation: clarification,
         answerType,
-        isMajorFault: '',
+        isMajorFault: Number(pointsCategory) > 1,
         choices,
-    })
+    });
+
+
 })
+// .filter(item => item.answerType === ANSWER_TYPES.ORDER)
