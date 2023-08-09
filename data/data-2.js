@@ -31,11 +31,11 @@ async function fetchAll() {
 }
 
 
-import { shuffle } from 'lodash';
+import { last, shuffle } from 'lodash';
 import _data from './data-2.json';
 import { mapQuestion, ANSWER_TYPES, mapCategories, mapChoice } from '../shared';
 
-export const categories = mapCategories(_data);
+export const categories = mapCategories(_data, 2);
 
 const answerTypesMappings = {
     normaalAntwoord: ANSWER_TYPES.SINGLE_CHOICE,
@@ -97,6 +97,7 @@ export const data = rawData.map(({
             break;
     }
 
+    const source = 2;
     return mapQuestion({
         id: `${seriesId}_${index + 1}`,
         title,
@@ -109,6 +110,21 @@ export const data = rawData.map(({
         answerType,
         isMajorFault: Number(pointsCategory) > 1,
         choices,
+        source,
+        images: [
+            { url: questionArray.image, path: 'image' },
+            ...choices
+                .map((i, index) => ({ url: i.image, collection: 'choices', path: 'image', index }))
+                .filter(i => !!i.url)
+        ]
+            .filter(Boolean)
+            .map(image => ({
+                ...image,
+                seriesId,
+                source: 2,
+                filename: last(image.url.split('/')),
+                savedFilename: `${source}__${seriesId}__${last(image.url.split('/'))}`
+            }))
     });
 
 

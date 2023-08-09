@@ -20,10 +20,6 @@ export default function Section() {
     const [score, setCurrentScore] = useState(0);
     const [currentAnswers, setCurrentAnswers] = useState({});
     const [showResults, setShowResults] = useState(false);
-    console.log({
-        category,
-        questions
-    })
     const init = useCallback((_category, randomize = true, listSize) => {
         const _questions = data
             .filter(i => i.seriesId === _category.seriesId || i.seriesId === Number(_category.seriesId))

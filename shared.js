@@ -4,6 +4,7 @@ export function mapQuestion({
     id,
     title,
     seriesId,
+    imageId,
     image,
     video,
     question,
@@ -11,12 +12,15 @@ export function mapQuestion({
     explanation,
     answerType,
     isMajorFault,
-    choices
+    choices,
+    source,
+    images
 }) {
     return {
         id,
         title,
         seriesId,
+        imageId,
         image,
         video,
         question,
@@ -24,11 +28,13 @@ export function mapQuestion({
         explanation,
         answerType,
         isMajorFault,
-        choices
+        choices,
+        source,
+        images
     }
 }
 
-export function mapCategories(data) {
+export function mapCategories(data, source) {
     return chain(data)
         .groupBy('seriesId')
         .map((group, seriesId) => {
@@ -38,7 +44,8 @@ export function mapCategories(data) {
                 slug: kebabCase(i.title),
                 path: `/${kebabCase(i.title)}`,
                 seriesId,
-                total: group.length
+                total: group.length,
+                source
             }
         })
         .value();
@@ -60,3 +67,5 @@ export const ANSWER_TYPES = {
     ORDER: 'ORDER',
     INPUT: 'INPUT',
 }
+
+export const ASSETS_BASEURL = process.env.NEXT_PUBLIC_ASSETS_BASEURL;

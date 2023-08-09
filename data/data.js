@@ -2,7 +2,7 @@ import { last, random } from 'lodash';
 import _data from './data.json';
 import { ANSWER_TYPES, mapQuestion, mapCategories, mapChoice } from '../shared';
 
-export const categories = mapCategories(_data)
+export const categories = mapCategories(_data, 1)
 
 const example = {
     "id": "12607",
@@ -44,17 +44,28 @@ export const data = _data.map(({
 }) => {
     const answerType = generateAnswerType(s)
     const { question, choices } = parseQuestion(q, answerType, s);
+    const source = 1;
+    const image = generateImageURL(qid, seriesId);
     return mapQuestion({
         id,
         title,
         seriesId,
-        image: generateImageURL(qid, seriesId),
+        imageId: qid,
+        image,
         question,
         answer: generateAnswerValue(s, answerType),
         explanation: generateExplanation(e),
         answerType,
         isMajorFault: Number(qw) > 1,
-        choices
+        choices,
+        source,
+        images: [
+            {
+                url: image,
+                path: 'image',
+                savedFilename: `${source}__${seriesId}__${qid}.jpg`
+            },
+        ]
     });
 });
 

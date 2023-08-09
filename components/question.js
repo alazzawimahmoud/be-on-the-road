@@ -48,7 +48,7 @@ export default function Question({ question, onCommit, progress, viewMode }) {
             {visualType && <div className="grid items-center content-center justify-center md:col-span-2">
                 <img
                     onDoubleClick={() => setShowExplanation(!showExplanation)}
-                    src={question.image}
+                    src={`${ASSETS_BASEURL}/${question.image}`}
                     alt={question.question}
                     className="object-center"
                 />
@@ -82,7 +82,7 @@ import { useEffect, useState } from 'react'
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { classNames } from '../utilities';
 import { BoltIcon } from '@heroicons/react/20/solid';
-import { VIEW_MODES } from '../shared';
+import { ASSETS_BASEURL, VIEW_MODES } from '../shared';
 
 function Choices({ choices, onChange, value, disabled }) {
     return (
@@ -102,7 +102,7 @@ function Choices({ choices, onChange, value, disabled }) {
                             <div className="flex items-center justify-between w-full">
                                 <div className="grid items-center content-center justify-center w-6 h-6">
                                     {choice.image && <img
-                                        src={choice.image}
+                                        src={`${ASSETS_BASEURL}/${choice.image}`}
                                         alt={choice.text}
                                         className="object-center"
                                     />}
