@@ -68,4 +68,4 @@ export const ANSWER_TYPES = {
     INPUT: 'INPUT',
 }
 
-export const ASSETS_BASEURL = process.env.NEXT_PUBLIC_ASSETS_BASEURL;
+export const ASSETS_BASEURL = 'https://res.cloudinary.com/be-on-the-road-assets/image/upload/v1691589425'

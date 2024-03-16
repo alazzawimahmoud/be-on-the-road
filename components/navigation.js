@@ -1,11 +1,18 @@
 import { kebabCase } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router';
-import { categories } from '../data';
+import api from '../utilities/api';
+import { useEffect, useState } from 'react';
 
 
 export default function Navigation() {
     const router = useRouter();
+    const [categories, setCategories] = useState([])
+    useEffect(() => {
+        api.getCategories().then(categories => {
+            setCategories(categories.data);
+        })
+    }, [])    
     return (
         <header className="bg-indigo-600">
             <nav className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8" aria-label="Top">

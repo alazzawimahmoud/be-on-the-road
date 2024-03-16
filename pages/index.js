@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Navigation from '../components/navigation'
-import data from '../data'
 
 export default function Home() {
   return (

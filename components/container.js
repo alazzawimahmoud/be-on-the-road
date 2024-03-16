@@ -12,10 +12,10 @@ import {
     XMarkIcon
 } from '@heroicons/react/24/outline'
 import { MagnifyingGlassIcon, BoltIcon, ChevronLeftIcon, ChevronRightIcon, UserIcon } from '@heroicons/react/20/solid'
-import { categories } from '../data';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import api from '../utilities/api';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -24,6 +24,7 @@ function classNames(...classes) {
 export default function Container({ header, children }) {
     const router = useRouter();
     const userId = router.query.userId;
+    const [categories, setCategories] = useState([])
     const [showSidebar, setShowSidebar] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const hrefWithQueryParams = (href) => {
@@ -33,6 +34,13 @@ export default function Container({ header, children }) {
         }
         return href;
     }
+    
+    useEffect(() => {
+        api.getCategories().then(categories => {
+            setCategories(categories.data);
+        })
+    }, [])
+
     return (
         <>
             <div>

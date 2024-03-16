@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
-import { categories, data } from '../data';
 import { useRouter } from 'next/router';
 import Container from '../components/container';
 import Question from '../components/question';
 import { classNames } from '../utilities';
 import { sampleSize, shuffle, size } from 'lodash';
 import { VIEW_MODES } from '../shared';
+import api from '../utilities/api';
 const btnClassNames = "border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 font-medium hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500";
 
 const EXAM_SIZE = 50;
+
 
 export default function Section() {
     const router = useRouter();
@@ -20,7 +21,8 @@ export default function Section() {
     const [score, setCurrentScore] = useState(0);
     const [currentAnswers, setCurrentAnswers] = useState({});
     const [showResults, setShowResults] = useState(false);
-    const init = useCallback((_category, randomize = true, listSize) => {
+    const init = useCallback(async (_category, randomize = true, listSize) => {
+        const { data } = await api.getQuestions(_category.seriesId)
         const _questions = data
             .filter(i => i.seriesId === _category.seriesId || i.seriesId === Number(_category.seriesId))
             .filter(i => showMajorOnly ? i.isMajorFault : true);
@@ -37,8 +39,10 @@ export default function Section() {
     useEffect(() => {
         const { section, viewMode = VIEW_MODES.STUDY, major = false } = router.query
         if (section) {
-            const _category = categories.find(i => i.slug === section)
-            setCategory(_category);
+            api.getCategories().then(categories => {
+                const _category = categories.data.find(i => i.slug === section)
+                setCategory(_category);
+            })
             setShowMajorOnly(major ? JSON.parse(router.query.major) : false)
             setViewMode(viewMode)
         }
