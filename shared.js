@@ -68,4 +68,4 @@ export const ANSWER_TYPES = {
     INPUT: 'INPUT',
 }
 
-export const ASSETS_BASEURL = 'https://res.cloudinary.com/be-on-the-road-assets/image/upload/v1710625875/be-on-the-road-assets'
+export const ASSETS_BASEURL = 'https://storage.googleapis.com/be-on-the-road.appspot.com/files_uuidNames'
