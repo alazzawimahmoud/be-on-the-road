@@ -1,20 +1,12 @@
 import { Fragment, useEffect, useState } from 'react'
-import { Dialog, Menu, Transition } from '@headlessui/react'
+import { Dialog, Transition } from '@headlessui/react'
 import {
     Bars3BottomLeftIcon,
-    BellIcon,
-    CalendarIcon,
-    ChartBarIcon,
-    FolderIcon,
-    HomeIcon,
-    InboxIcon,
-    UsersIcon,
     XMarkIcon
 } from '@heroicons/react/24/outline'
-import { MagnifyingGlassIcon, BoltIcon, ChevronLeftIcon, ChevronRightIcon, UserIcon } from '@heroicons/react/20/solid'
+import { BoltIcon, ChevronLeftIcon, ChevronRightIcon, UserIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import api from '../utilities/api';
 
 function classNames(...classes) {

@@ -1,4 +1,6 @@
 import { data, categories } from '../../data';
+import { CONSTANTS } from '../../data/data';
+import { ANSWER_TYPES, mapChoice } from '../../shared';
 
 export default async function handler(req, res) {
   const { source, categoryId, type } = req.query;
@@ -16,6 +18,15 @@ export default async function handler(req, res) {
     results = data
       .filter(i => source ? (i.source == source) : true)
       .filter(i => i.seriesId == categoryId)
+      // Perform MISC operations
+      .map((question) => {
+        // TODO: Move this operation to parsing stage
+        if (question.answerType === ANSWER_TYPES.SINGLE_CHOICE && question.choices.length === 0) {
+          question.answerType = ANSWER_TYPES.YES_NO
+          question.choices = CONSTANTS.YES_NO_VALUES.map(mapChoice('text'))
+        }
+        return question
+      })
   }
 
   if (type === 'categories') {

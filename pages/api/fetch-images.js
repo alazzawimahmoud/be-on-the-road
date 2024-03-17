@@ -36,9 +36,9 @@ const processUrls = async urls => {
 };
 
 export default async function handler(req, res) {
-  const { source } = req.query;
-  const results = data
-    .filter(i => source && (i.source === Number(source)))
+  // const { source } = req.query;
+  // const results = data
+  //   .filter(i => source && (i.source === Number(source)))
 
   // Source 1
   // .map(i => ({ url: i.image, filename: `${i.source}__${i.seriesId}__${i.imageId}.jpg` }))
@@ -56,5 +56,5 @@ export default async function handler(req, res) {
   //   console.error(error)
   // }
 
-  res.status(200).json({ data: results })
+  res.status(200).json({ data: 'OK' })
 }

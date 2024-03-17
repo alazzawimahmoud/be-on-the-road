@@ -14,7 +14,7 @@ const EXAM_SIZE = 50;
 export default function Section() {
     const router = useRouter();
     const [showMajorOnly, setShowMajorOnly] = useState(false);
-    const [viewMode, setViewMode] = useState(VIEW_MODES.STUDY);
+    const [viewMode, setViewMode] = useState(VIEW_MODES.SINGLE);
     const [category, setCategory] = useState();
     const [questions, setQuestions] = useState([]);
     const [selectedQuestion, setSelectedQuestion] = useState();
@@ -36,30 +36,11 @@ export default function Section() {
         setShowResults(false);
     }, [showMajorOnly]);
 
-    useEffect(() => {
-        const { section, viewMode = VIEW_MODES.STUDY, major = false } = router.query
-        if (section) {
-            api.getCategories().then(categories => {
-                const _category = categories.data.find(i => i.slug === section)
-                setCategory(_category);
-            })
-            setShowMajorOnly(major ? JSON.parse(router.query.major) : false)
-            setViewMode(viewMode)
-        }
-    }, [router.query]);
-
-
-    useEffect(() => {
-        if (category) {
-            init(category);
-        }
-    }, [showMajorOnly, category, init]);
-
-    useEffect(() => {
-        if (size(currentAnswers) === EXAM_SIZE) {
-            setShowResults(true);
-        }
-    }, [currentAnswers]);
+    const getExamSize = useCallback(() => size(questions) >= EXAM_SIZE ? EXAM_SIZE : size(questions), [questions])
+    const startAnExam = () => {
+        setViewMode(VIEW_MODES.SINGLE)
+        init(category, true, getExamSize());
+    }
 
     const onSubmit = (answer, question) => {
         let answerIsCorrect = false;
@@ -80,10 +61,31 @@ export default function Section() {
             setSelectedQuestion(_selectedQuestion);
         }
     }
+    
+    useEffect(() => {
+        const { section, viewMode = VIEW_MODES.SINGLE, major = false } = router.query
+        if (section) {
+            api.getCategories().then(categories => {
+                const _category = categories.data.find(i => i.slug === section)
+                setCategory(_category);
+            })
+            setShowMajorOnly(major ? JSON.parse(router.query.major) : false)
+            setViewMode(viewMode)
+        }
+    }, [router.query]);
 
-    const startAnExam = () => {
-        init(category, true, EXAM_SIZE);
-    }
+
+    useEffect(() => {
+        if (category) {
+            init(category);
+        }
+    }, [showMajorOnly, category, init]);
+
+    useEffect(() => {
+        if (size(currentAnswers) === getExamSize()) {
+            setShowResults(true);
+        }
+    }, [currentAnswers, getExamSize]);
 
     return (
         <Container header={category?.title}>
@@ -157,7 +159,7 @@ export default function Section() {
                     progress={`${questions.indexOf(q) + 1} / ${questions.length}`}
                     viewMode={viewMode}
                 />)}
-                {viewMode === VIEW_MODES.SINGLE && <Question
+                {viewMode === VIEW_MODES.SINGLE && selectedQuestion && <Question
                     question={selectedQuestion}
                     onCommit={(answer) => onSubmit(answer, selectedQuestion)}
                     currentAnswer={currentAnswers[selectedQuestion?.id]}
